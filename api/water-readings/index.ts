@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { put } from '@vercel/blob';
-import { db } from '../../src/db';
+import { db } from '../_lib/db';
 import { waterReadings, flats } from '../../src/db/schema';
 import { eq, and, or, isNull } from 'drizzle-orm';
 import { requireAuth } from '../_lib/auth';

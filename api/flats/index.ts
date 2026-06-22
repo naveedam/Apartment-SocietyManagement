@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { db } from '../../src/db';
+import { db } from '../_lib/db';
 import { flats } from '../../src/db/schema';
 import { eq } from 'drizzle-orm';
 import { requireAdmin } from '../_lib/auth';
