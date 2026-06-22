@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { db } from '../_lib/db';
-import { flats } from '../../src/db/schema.js';
+import { flats } from '../_lib/schema';
 import { eq } from 'drizzle-orm';
 import { requireAdmin } from '../_lib/auth';
 
