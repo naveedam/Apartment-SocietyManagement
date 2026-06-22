@@ -53,33 +53,18 @@ export function parseSessionCookie(cookieHeader: string | undefined): string | n
   const match = cookieHeader.match(new RegExp(`${COOKIE_NAME}=([^;]+)`));
   return match ? match[1] : null;
 }
-export async function requireAdmin(req: VercelRequest, res: VercelResponse): Promise<SessionPayload | null> {
-  const token = parseSessionCookie(req.headers.cookie);
-  if (!token) {
-    res.status(401).json({ error: 'Not authenticated' });
-    return null;
-  }
-  const payload = await verifySessionToken(token);
-  if (!payload) {
-    res.status(401).json({ error: 'Not authenticated' });
-    return null;
-  }
-  if (payload.role !== 'admin') {
-    res.status(403).json({ error: 'Admin access required' });
-    return null;
-  }
-  return payload;
-}
+
 export async function requireAuth(req: VercelRequest, res: VercelResponse): Promise<SessionPayload | null> {
   const token = parseSessionCookie(req.headers.cookie);
-  if (!token) {
-    res.status(401).json({ error: 'Not authenticated' });
-    return null;
-  }
+  if (!token) { res.status(401).json({ error: 'Not authenticated' }); return null; }
   const payload = await verifySessionToken(token);
-  if (!payload) {
-    res.status(401).json({ error: 'Not authenticated' });
-    return null;
-  }
+  if (!payload) { res.status(401).json({ error: 'Not authenticated' }); return null; }
   return payload;
+}
+
+export async function requireAdmin(req: VercelRequest, res: VercelResponse): Promise<SessionPayload | null> {
+  const session = await requireAuth(req, res);
+  if (!session) return null;
+  if (session.role !== 'admin') { res.status(403).json({ error: 'Admin access required' }); return null; }
+  return session;
 }
