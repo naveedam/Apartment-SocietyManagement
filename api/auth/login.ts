@@ -27,8 +27,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const token = await createSessionToken({
     userId: user.id,
     associationId: user.associationId,
-    role: user.role as 'admin' | 'resident',
-    flatId: user.flatId,
+    role: user.role as 'admin' | 'resident' | 'staff',
+    flatId: user.flatId ?? null,
   });
 
   res.setHeader('Set-Cookie', serializeSessionCookie(token));

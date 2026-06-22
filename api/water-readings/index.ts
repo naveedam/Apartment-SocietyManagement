@@ -19,10 +19,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         readings = await db.select().from(waterReadings)
           .where(and(eq(waterReadings.associationId, session.associationId), isNull(waterReadings.flatId)));
       } else {
+        const flatCondition = session.flatId
+          ? eq(waterReadings.flatId, session.flatId)
+          : isNull(waterReadings.flatId);
         readings = await db.select().from(waterReadings).where(
           and(
             eq(waterReadings.associationId, session.associationId),
-            or(eq(waterReadings.flatId, session.flatId), isNull(waterReadings.flatId)),
+            or(flatCondition, isNull(waterReadings.flatId)),
           ),
         );
       }
