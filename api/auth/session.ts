@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { db } from '../_lib/db';
-import { users } from '../../src/db/schema';
+import { users } from '../../src/db/schema.js';
 import { eq } from 'drizzle-orm';
 import { verifySessionToken, parseSessionCookie } from '../_lib/auth';
 

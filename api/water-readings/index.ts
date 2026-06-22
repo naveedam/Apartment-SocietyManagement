@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { put } from '@vercel/blob';
 import { db } from '../_lib/db';
-import { waterReadings, flats } from '../../src/db/schema';
+import { waterReadings, flats } from '../../src/db/schema.js';
 import { eq, and, or, isNull } from 'drizzle-orm';
 import { requireAuth } from '../_lib/auth';
 

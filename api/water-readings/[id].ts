@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { db } from '../_lib/db';
-import { waterReadings } from '../../src/db/schema';
+import { waterReadings } from '../../src/db/schema.js';
 import { eq, and } from 'drizzle-orm';
 import { requireAdmin } from '../_lib/auth';
 
