@@ -1,10 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { clearSessionCookie } from '../_lib/auth';
 
-export default function handler(req: VercelRequest, res: VercelResponse) {
-  return res.status(200).json({
-    hasDbUrl: !!process.env.DATABASE_URL,
-    hasJwt: !!process.env.JWT_SECRET,
-    hasBlob: !!process.env.BLOB_READ_WRITE_TOKEN,
-    dbUrlStart: process.env.DATABASE_URL?.substring(0, 40) ?? 'MISSING',
-  });
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  res.setHeader('Set-Cookie', clearSessionCookie());
+  return res.status(200).json({ success: true });
 }
