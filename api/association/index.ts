@@ -5,45 +5,64 @@ import { eq } from 'drizzle-orm';
 import { requireAuth, requireAdmin } from '../_lib/auth';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  const session = await requireAuth(req, res);
+  if (!session) return;
+
+  const url = req.url || '';
+
+  // /api/association/office-bearers
+  if (url.includes('/office-bearers')) {
+    if (req.method === 'GET') {
+      const rows = await db.select().from(officeBearers).where(eq(officeBearers.associationId, session.associationId));
+      return res.status(200).json(rows);
+    }
+    if (req.method === 'POST') {
+      const admin = await requireAdmin(req, res);
+      if (!admin) return;
+      const { designation, name, phone, email } = req.body;
+      if (!designation || !name) return res.status(400).json({ error: 'designation and name required' });
+      const [row] = await db.insert(officeBearers).values({ associationId: session.associationId, designation, name, phone, email }).returning();
+      return res.status(201).json(row);
+    }
+    if (req.method === 'DELETE') {
+      const admin = await requireAdmin(req, res);
+      if (!admin) return;
+      const { id } = req.query;
+      if (!id || typeof id !== 'string') return res.status(400).json({ error: 'Missing id' });
+      await db.delete(officeBearers).where(eq(officeBearers.id, id));
+      return res.status(200).json({ success: true });
+    }
+  }
+
+  // /api/association/utilities
+  if (url.includes('/utilities')) {
+    if (req.method === 'GET') {
+      const rows = await db.select().from(utilityAccounts).where(eq(utilityAccounts.associationId, session.associationId));
+      return res.status(200).json(rows);
+    }
+    if (req.method === 'POST') {
+      const admin = await requireAdmin(req, res);
+      if (!admin) return;
+      const { utilityType, providerName, accountNumber, notes } = req.body;
+      if (!utilityType) return res.status(400).json({ error: 'utilityType required' });
+      const [row] = await db.insert(utilityAccounts).values({ associationId: session.associationId, utilityType, providerName, accountNumber, notes }).returning();
+      return res.status(201).json(row);
+    }
+    if (req.method === 'DELETE') {
+      const admin = await requireAdmin(req, res);
+      if (!admin) return;
+      const { id } = req.query;
+      if (!id || typeof id !== 'string') return res.status(400).json({ error: 'Missing id' });
+      await db.delete(utilityAccounts).where(eq(utilityAccounts.id, id));
+      return res.status(200).json({ success: true });
+    }
+  }
+
+  // /api/association (base — GET association info)
   if (req.method === 'GET') {
-    const session = await requireAuth(req, res);
-    if (!session) return;
-    try {
-      const [association] = await db.select().from(associations).where(eq(associations.id, session.associationId)).limit(1);
-      if (!association) return res.status(404).json({ error: 'Association not found' });
-      const bearers = await db.select().from(officeBearers).where(eq(officeBearers.associationId, session.associationId));
-      const utilities = await db.select().from(utilityAccounts).where(eq(utilityAccounts.associationId, session.associationId));
-      return res.status(200).json({ association, officeBearers: bearers, utilities });
-    } catch (err: any) {
-      console.error('association GET error:', err);
-      return res.status(500).json({ error: err.message || 'Internal server error' });
-    }
+    const [assoc] = await db.select().from(associations).where(eq(associations.id, session.associationId)).limit(1);
+    return res.status(200).json(assoc);
   }
 
-  if (req.method === 'PATCH') {
-    const session = await requireAdmin(req, res);
-    if (!session) return;
-    try {
-      const { name, address, registrationNo, bankAccountName, bankAccountNumber, bankIfsc, bankName, waterDiffEqualWeight, waterDiffAreaWeight, waterDiffConsumptionWeight } = req.body;      const updates: Record<string, any> = {};
-      if (name !== undefined) updates.name = name;
-      if (address !== undefined) updates.address = address;
-      if (registrationNo !== undefined) updates.registrationNo = registrationNo;
-      if (bankAccountName !== undefined) updates.bankAccountName = bankAccountName;
-      if (bankAccountNumber !== undefined) updates.bankAccountNumber = bankAccountNumber;
-      if (bankIfsc !== undefined) updates.bankIfsc = bankIfsc;
-      if (bankName !== undefined) updates.bankName = bankName;
-      if (waterDiffEqualWeight !== undefined) updates.waterDiffEqualWeight = waterDiffEqualWeight;
-      if (waterDiffAreaWeight !== undefined) updates.waterDiffAreaWeight = waterDiffAreaWeight;
-      if (waterDiffConsumptionWeight !== undefined) updates.waterDiffConsumptionWeight = waterDiffConsumptionWeight;
-      if (Object.keys(updates).length === 0) return res.status(400).json({ error: 'No fields to update' });
-
-      const [updated] = await db.update(associations).set(updates).where(eq(associations.id, session.associationId)).returning();
-      return res.status(200).json({ association: updated });
-    } catch (err: any) {
-      console.error('association PATCH error:', err);
-      return res.status(500).json({ error: err.message || 'Internal server error' });
-    }
-  }
-
-  return res.status(405).json({ error: 'Method not allowed' });
+  return res.status(404).json({ error: 'Not found' });
 }
