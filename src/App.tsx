@@ -5,6 +5,7 @@ import { FlatsDirectory } from './components/FlatsDirectory';
 import { AssociationInfo } from './components/AssociationInfo';
 import { Vendors } from './components/Vendors';
 import { WaterMeters } from './components/WaterMeters';
+import { BudgetProposal } from './components/BudgetProposal';
 
 type Tab = 'flats' | 'association' | 'vendors'|'water';
 
@@ -20,6 +21,7 @@ function AppContent() {
     { id: 'association', label: 'Association' },
     { id: 'vendors', label: 'Vendors' },
     { id: 'water', label: 'Water Meters' },
+    { id: 'budget', label: 'Budget & Dues' },
   ];
 
   return (
@@ -42,6 +44,7 @@ function AppContent() {
       {tab === 'association' && <AssociationInfo />}
       {tab === 'vendors' && <Vendors />}
       {tab === 'water' && <WaterMeters />}
+      {tab === 'budget' && <BudgetProposal />}
     </div>
   );
 }

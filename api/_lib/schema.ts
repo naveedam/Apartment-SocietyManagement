@@ -226,3 +226,36 @@ export const waterReadings = pgTable('water_readings', {
 }, (table) => ({
   assocIdx: index('water_readings_assoc_idx').on(table.associationId),
 }));
+export const budgetProposals = pgTable('budget_proposals', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  associationId: uuid('association_id').notNull().references(() => associations.id),
+  financialYear: text('financial_year').notNull(),
+  operationalBudget: numeric('operational_budget', { precision: 12, scale: 2 }).notNull(),
+  capitalBudget: numeric('capital_budget', { precision: 12, scale: 2 }).notNull(),
+  totalBudget: numeric('total_budget', { precision: 12, scale: 2 }).notNull(),
+  lineItems: text('line_items').notNull(),
+  status: text('status').notNull().default('draft'),
+  approvedAt: timestamp('approved_at', { withTimezone: true }),
+  approvedBy: uuid('approved_by').references(() => users.id),
+  createdBy: uuid('created_by').notNull().references(() => users.id),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  uniqueYear: unique().on(table.associationId, table.financialYear),
+  assocIdx: index('budget_proposals_assoc_idx').on(table.associationId),
+}));
+
+export const expenses = pgTable('expenses', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  associationId: uuid('association_id').notNull().references(() => associations.id),
+  financialYear: text('financial_year').notNull(),
+  period: text('period').notNull(),
+  category: text('category').notNull(),
+  description: text('description').notNull(),
+  amount: numeric('amount', { precision: 10, scale: 2 }).notNull(),
+  vendorId: uuid('vendor_id').references(() => vendors.id),
+  billUrl: text('bill_url'),
+  recordedBy: uuid('recorded_by').notNull().references(() => users.id),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  assocIdx: index('expenses_assoc_idx').on(table.associationId),
+}));
