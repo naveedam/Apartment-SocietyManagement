@@ -11,9 +11,9 @@
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
     "@vercel/blob": "^2.4.1",
-    "bcryptjs": "^3.0.3",
+    "bcryptjs": "^2.4.3",
     "drizzle-orm": "^0.45.2",
-    "jose": "^6.2.3",
+    "jose": "^4.15.9",
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
   },
