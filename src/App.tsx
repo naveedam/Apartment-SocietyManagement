@@ -7,7 +7,7 @@ import { Vendors } from './components/Vendors';
 import { WaterMeters } from './components/WaterMeters';
 import { BudgetProposal } from './components/BudgetProposal';
 
-type Tab = 'flats' | 'association' | 'vendors'|'water';
+type Tab = 'flats' | 'association' | 'vendors' | 'water' | 'budget';
 
 function AppContent() {
   const { user, loading, logout } = useAuth();
